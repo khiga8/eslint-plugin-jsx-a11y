@@ -11,11 +11,21 @@ import type { ESLintContext } from '../../flow/eslint';
 const getElementType = (context: ESLintContext): ((node: JSXOpeningElement) => string) => {
   const { settings } = context;
   const polymorphicPropName = settings['jsx-a11y']?.polymorphicPropName;
+  const polymorphicAllowList = settings['jsx-a11y']?.polymorphicAllowList;
+
   const componentMap = settings['jsx-a11y']?.components;
 
   return (node: JSXOpeningElement): string => {
     const polymorphicProp = polymorphicPropName ? getLiteralPropValue(getProp(node.attributes, polymorphicPropName)) : undefined;
-    const rawType = polymorphicProp ?? elementType(node);
+
+    let rawType = elementType(node);
+    if (polymorphicProp) {
+      if (!polymorphicAllowList) {
+        rawType = polymorphicProp;
+      } else if (polymorphicAllowList.includes(rawType)) {
+        rawType = polymorphicProp;
+      }
+    }
 
     if (!componentMap) {
       return rawType;
