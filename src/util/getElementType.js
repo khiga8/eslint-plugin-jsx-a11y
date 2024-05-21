@@ -20,9 +20,7 @@ const getElementType = (context: ESLintContext): ((node: JSXOpeningElement) => s
 
     let rawType = elementType(node);
     if (polymorphicProp) {
-      if (!polymorphicAllowList) {
-        rawType = polymorphicProp;
-      } else if (polymorphicAllowList.includes(rawType)) {
+      if (!polymorphicAllowList || polymorphicAllowList.includes(rawType)) {
         rawType = polymorphicProp;
       }
     }
